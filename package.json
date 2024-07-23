@@ -1,0 +1,31 @@
+{
+  "name": "dwitter",
+  "version": "1.0.0",
+  "description": "twitter clone coding",
+  "main": "app.js",
+  "type": "module",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "nodemon app"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/zoeyul07/Dwitter.git"
+  },
+  "author": "seoyulKim",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/zoeyul07/Dwitter/issues"
+  },
+  "homepage": "https://github.com/zoeyul07/Dwitter#readme",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^4.19.2",
+    "express-async-errors": "^3.1.1",
+    "helmet": "^7.1.0",
+    "morgan": "^1.10.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.4"
+  }
+}
