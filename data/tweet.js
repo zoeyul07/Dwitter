@@ -17,19 +17,19 @@ let tweets = [
   },
 ];
 
-export function getAll() {
+export async function getAll() {
   return tweets;
 }
 
-export function getAllByUserName(userName) {
+export async function getAllByUserName(userName) {
   return tweets.filter((tweet) => tweet.userName === userName);
 }
 
-export function getById(id) {
+export async function getById(id) {
   return tweets.find((tweet) => tweet.id === Number(id));
 }
 
-export function create(text, name, userName) {
+export async function create(text, name, userName) {
   const tweet = {
     id: Date.now().toString(),
     text,
@@ -42,15 +42,15 @@ export function create(text, name, userName) {
   return tweet;
 }
 
-export function update(id, text) {
+export async function update(id, text) {
   const tweet = tweets.find((tweet) => tweet.id === Number(id));
   if (tweet) {
     tweet.text = text;
   }
-  return text;
+  return tweet;
 }
 
 //javascript 자체에 delete가 있으므로 사용할 수 없음
-export function remove(id) {
+export async function remove(id) {
   tweets = tweets.filter((tweet) => tweet.id !== id);
 }
