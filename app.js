@@ -6,6 +6,8 @@ import "express-async-errors";
 import tweetsRouter from "./router/tweets.js";
 import authRouter from "./router/auth.js";
 import { config } from "./config.js";
+
+import { initSocket } from "./connection/socket.js";
 const app = express();
 
 app.use(express.json());
@@ -23,4 +25,12 @@ app.use((error, req, res, next) => {
   console.error(error);
   res.sendStatus(500);
 });
-app.listen(config.host.port);
+const server = app.listen(config.host.port);
+initSocket(server);
+
+// const socketIO = new Server(server, { cors: { origin: "*" } });
+
+// socketIO.on("connection", (socket) => {
+//   console.log("client here!");
+//   socketIO.emit("dwitter", "hello");
+// });

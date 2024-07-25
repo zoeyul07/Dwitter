@@ -19,5 +19,5 @@ export const config = {
   bcrypt: {
     slatRounds: parseInt(required("BCRYPT_SALT_ROUNDS", 12)),
   },
-  port: parseInt(required("HOST_PORT", 8080)),
+  host: { port: parseInt(required("HOST_PORT", 8080)) },
 };
