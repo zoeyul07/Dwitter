@@ -6,7 +6,7 @@ const AUTH_ERROR = { message: "Authentication Error" };
 export const isAuth = async (req, res, next) => {
   const authHeader = req.get("authorization");
   if (!(authHeader && authHeader.startsWith("Bearer "))) {
-    return res.statue(401).json(AUTH_ERROR);
+    return res.status(401).json(AUTH_ERROR);
   }
 
   const token = authHeader.split(" ")[1];
@@ -20,7 +20,7 @@ export const isAuth = async (req, res, next) => {
       }
       const user = await userRepository.findById(decoded.id);
       if (!user) {
-        return res.status(401), json(AUTH_ERROR);
+        return res.status(401).json(AUTH_ERROR);
       }
       //다른콜백함수에서 동일하게 등록해야하는 데이터라면 하단과 같이 등록 가능
       req.userId = user.id; //req.customData

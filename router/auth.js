@@ -3,11 +3,12 @@ import "express-async-errors";
 import { body } from "express-validator";
 import { validate } from "../middleware/validator.js";
 import * as authController from "../controller/auth.js";
+import { isAuth } from "../middleware/auth.js";
 
 const router = express.Router();
 
 const validateCredential = [
-  body("username")
+  body("userName")
     .trim()
     .notEmpty()
     .withMessage("username should be at least 5 characters"),
