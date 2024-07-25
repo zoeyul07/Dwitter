@@ -1,19 +1,6 @@
 import * as userRepository from "./auth.js";
 
-let tweets = [
-  {
-    id: 1,
-    text: "hello1",
-    createdAt: new Date().toString(),
-    userId: "1",
-  },
-  {
-    id: 2,
-    text: "hello2",
-    createdAt: new Date().toString(),
-    userId: "2",
-  },
-];
+let tweets = [];
 
 export async function getAll() {
   return Promise.all(
@@ -31,20 +18,20 @@ export async function getAllByUserName(userName) {
 }
 
 export async function getById(id) {
-  const found = tweets.find((tweet) => tweet.id === Number(id));
+  const found = tweets.find((tweet) => tweet.id === id);
   if (!found) {
     return null;
   }
-  const { userName, name, url } = await userRepository.findById(found.userId);
-  return { ...found, username, name, url };
+  const user = await userRepository.findById(found.userId);
+  return { ...found, user };
 }
 
 export async function create(text, userId) {
   const tweet = {
-    id: new Date().toString(),
+    id: Date.now().toString(),
     text,
     createAt: new Date(),
-    usrID,
+    userId,
   };
 
   tweets = [tweet, ...tweets];
