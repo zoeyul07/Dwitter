@@ -1,52 +1,72 @@
-import * as userRepository from "./auth.js";
+import { sequelize } from "../db/database.js";
+import SQ from "sequelize";
+import { User } from "./auth.js";
 
-let tweets = [];
+const Sequelize = SQ.Sequelize;
+const DataTypes = SQ.DataTypes;
 
+const Tweet = sequelize.define("tweet", {
+  id: {
+    type: DataTypes.INTEGER,
+    autoIncrement: true,
+    allowNull: false,
+    primaryKey: true,
+  },
+  text: { type: DataTypes.TEXT, allowNull: false },
+});
+//foreign key 연결
+Tweet.belongsTo(User);
+
+const INCLUDE_USER = {
+  attributes: [
+    "id",
+    "text",
+    "createdAt",
+    "userId",
+    [Sequelize.col("user.name"), "name"],
+    [Sequelize.col("user.name"), "userName"],
+    [Sequelize.col("user.name"), "url"],
+  ],
+  include: { model: User, attributes: [] },
+};
+
+const ORDER_DESC = { order: [["createdAt", "DESC"]] };
 export async function getAll() {
-  return Promise.all(
-    tweets.map(async (tweet) => {
-      const user = await userRepository.findById(tweet.userId);
-      return { ...tweet, ...user };
-    })
-  );
+  return Tweet.findAll({ ...INCLUDE_USER, ...ORDER_DESC });
 }
 
 export async function getAllByUserName(userName) {
-  return getAll().then((tweets) => {
-    tweets.filter((tweet) => tweet.userName === userName);
+  return Tweet.findAll({
+    ...INCLUDE_USER,
+    ...ORDER_DESC,
+    include: { ...INCLUDE_USER.include, where: { userName } },
   });
 }
 
 export async function getById(id) {
-  const found = tweets.find((tweet) => tweet.id === id);
-  if (!found) {
-    return null;
-  }
-  const user = await userRepository.findById(found.userId);
-  return { ...found, user };
+  return Tweet.findOne({ where: { id }, ...INCLUDE_USER });
 }
 
 export async function create(text, userId) {
-  const tweet = {
-    id: Date.now().toString(),
-    text,
-    createAt: new Date(),
-    userId,
-  };
-
-  tweets = [tweet, ...tweets];
-  return getById(tweet.id);
+  console.log(text);
+  return Tweet.create({ text, userId }).then((data) =>
+    this.getById(data.dataValues.id)
+  );
 }
 
 export async function update(id, text) {
-  const tweet = tweets.find((tweet) => tweet.id === Number(id));
-  if (tweet) {
+  return Tweet.findByPk(id, INCLUDE_USER).then((tweet) => {
     tweet.text = text;
-  }
-  return getById(tweet.id);
+    //저장한 자기자신 promise로 Return
+    return tweet.save();
+  });
 }
 
 //javascript 자체에 delete가 있으므로 사용할 수 없음
 export async function remove(id) {
-  tweets = tweets.filter((tweet) => tweet.id !== id);
+  console.log(id);
+  return Tweet.findByPk(id).then((tweet) => {
+    console.log(tweet);
+    tweet.destroy();
+  });
 }
