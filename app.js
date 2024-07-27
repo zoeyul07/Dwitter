@@ -8,6 +8,7 @@ import authRouter from "./router/auth.js";
 import { config } from "./config.js";
 
 import { initSocket } from "./connection/socket.js";
+import { connectDB } from "./db/database.js";
 const app = express();
 
 app.use(express.json());
@@ -25,8 +26,13 @@ app.use((error, req, res, next) => {
   console.error(error);
   res.sendStatus(500);
 });
-const server = app.listen(config.host.port);
-initSocket(server);
+
+connectDB()
+  .then(() => {
+    const server = app.listen(config.host.port);
+    initSocket(server);
+  })
+  .catch(console.error);
 
 // const socketIO = new Server(server, { cors: { origin: "*" } });
 

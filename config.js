@@ -17,7 +17,8 @@ export const config = {
     expiresInSec: parseInt(required("JWT_EXPIRES_SEC", 86400)),
   },
   bcrypt: {
-    slatRounds: parseInt(required("BCRYPT_SALT_ROUNDS", 12)),
+    saltRounds: parseInt(required("BCRYPT_SALT_ROUNDS", 12)),
   },
   host: { port: parseInt(required("HOST_PORT", 8080)) },
+  db: { mongoDBHost: required("MONGO_DB_HOST") },
 };
