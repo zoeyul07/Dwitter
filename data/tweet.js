@@ -1,52 +1,65 @@
+import { getTweets } from "../db/database.js";
 import * as userRepository from "./auth.js";
 
-let tweets = [];
+import MongoDb from "mongodb";
+
+// prettier-ignore
+const ObjectId = MongoDb.ObjectId;
 
 export async function getAll() {
-  return Promise.all(
-    tweets.map(async (tweet) => {
-      const user = await userRepository.findById(tweet.userId);
-      return { ...tweet, ...user };
-    })
-  );
+  return getTweets().find().sort({ createdAt: -1 }).toArray().then(mapTweets);
 }
 
 export async function getAllByUserName(userName) {
-  return getAll().then((tweets) => {
-    tweets.filter((tweet) => tweet.userName === userName);
-  });
+  return getTweets()
+    .find({ userName })
+    .sort({ createdAt: -1 })
+    .toArray()
+    .then(mapTweets);
 }
 
 export async function getById(id) {
-  const found = tweets.find((tweet) => tweet.id === id);
-  if (!found) {
-    return null;
-  }
-  const user = await userRepository.findById(found.userId);
-  return { ...found, user };
+  return getTweets()
+    .findOne({ _id: new ObjectId(id) })
+    .then(mapOptionalTweet);
 }
 
 export async function create(text, userId) {
+  const { name, userName, url } = await userRepository.findById(userId);
   const tweet = {
-    id: Date.now().toString(),
     text,
     createAt: new Date(),
     userId,
+    name,
+    userName,
+    url,
   };
-
-  tweets = [tweet, ...tweets];
-  return getById(tweet.id);
+  return getTweets()
+    .insertOne(tweet)
+    .then((data) => mapOptionalTweet({ ...tweet, _id: data.insertedId }));
 }
 
 export async function update(id, text) {
-  const tweet = tweets.find((tweet) => tweet.id === Number(id));
-  if (tweet) {
-    tweet.text = text;
-  }
-  return getById(tweet.id);
+  return getTweets()
+    .findOneAndUpdate(
+      { _id: new ObjectId(id) },
+      { $set: { text } },
+      //업데이트 된 후의 데이터를 받아옴
+      { returnDocument: "after" }
+    )
+    .then((result) => result.value)
+    .then(mapOptionalTweet);
 }
 
 //javascript 자체에 delete가 있으므로 사용할 수 없음
 export async function remove(id) {
-  tweets = tweets.filter((tweet) => tweet.id !== id);
+  return getTweets().deleteOne({ _id: new ObjectId(id) });
+}
+
+function mapOptionalTweet(tweet) {
+  return tweet ? { ...tweet, id: tweet._id.toString() } : tweet;
+}
+
+function mapTweets(tweets) {
+  return tweets.map(mapOptionalTweet);
 }
