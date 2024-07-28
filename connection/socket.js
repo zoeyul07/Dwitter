@@ -6,7 +6,9 @@ import { config } from "../config.js";
 //typescript 사용시 private, static 등 이용 가능
 class Socket {
   constructor(server) {
-    this.io = new Server(server, { cors: { origin: "*" } });
+    this.io = new Server(server, {
+      cors: { origin: config.cors.allowedOrigin },
+    });
 
     this.io.use((socket, next) => {
       const token = socket.handShake.auth.token;

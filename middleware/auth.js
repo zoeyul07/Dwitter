@@ -22,6 +22,7 @@ export const isAuth = async (req, res, next) => {
     }
     //다른콜백함수에서 동일하게 등록해야하는 데이터라면 하단과 같이 등록 가능
     req.userId = user.id; //req.customData
+    req.token = token;
     next();
   });
 };
