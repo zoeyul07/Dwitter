@@ -52,5 +52,5 @@ export async function me(req, res, next) {
     return res.status(404).json({ message: "user not found" });
   }
 
-  res.status(200).json({ token: req.token, username: user.username });
+  res.status(200).json({ token: req.token, userName: user.userName });
 }
