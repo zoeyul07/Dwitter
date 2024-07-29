@@ -19,7 +19,11 @@ export async function signup(req, res) {
     email,
     url,
   });
+
   const token = createJwtToken(userId);
+  //cookie header를 사용하면 브라우저 외 클라이언트는 사용할 수 없다.
+  setToken(res, token);
+
   res.status(201).json({ token, userName });
 }
 
@@ -37,6 +41,7 @@ export async function login(req, res) {
   }
 
   const token = createJwtToken(user.id);
+  setToken(res, token);
   res.status(200).json({ token, userName });
 }
 
@@ -53,4 +58,18 @@ export async function me(req, res, next) {
   }
 
   res.status(200).json({ token: req.token, userName: user.userName });
+}
+
+function setToken(res, token) {
+  const options = {
+    //브라우저에서 해당 토큰은 저장할 때 만료 시간 설정
+    //토큰 새성 시간과 동일하게
+    //millisecond
+    maxAge: config.jwt.expiresInSec * 1000,
+    httpOnly: true,
+    //클라이언트와 서버가 다른 ip이더라도 동작하도록
+    sameSite: "none",
+    secure: true,
+  };
+  res.cookie("token", token, options);
 }

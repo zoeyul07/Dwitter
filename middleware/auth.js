@@ -5,12 +5,26 @@ import { config } from "../config.js";
 const AUTH_ERROR = { message: "Authentication Error" };
 
 export const isAuth = async (req, res, next) => {
+  //1.cookie(for browser)
+  //2. header (for Non-browser client)  쿠카 사용하지 않음
+
+  let token;
+  //check header first
+
   const authHeader = req.get("authorization");
   if (!(authHeader && authHeader.startsWith("Bearer "))) {
-    return res.status(401).json(AUTH_ERROR);
+    token = authHeader.split(" ")[1];
   }
 
-  const token = authHeader.split(" ")[1];
+  //no token in header, check cookie
+  if (!token) {
+    token = req.cookies["token"];
+  }
+
+  //header와 cooke에 토큰이 없을 때
+  if (!token) {
+    return res.status(401).json(AUTH_ERROR);
+  }
 
   jwt.verify(token, config.jwt.secretKey, async (error, decoded) => {
     if (error) {
