@@ -9,6 +9,7 @@ import { config } from "./config.js";
 import cookieParser from "cookie-parser";
 import { initSocket } from "./connection/socket.js";
 import { sequelize } from "./db/database.js";
+import { csrfCheck } from "./middleware/csrf.js";
 const app = express();
 
 const corsOption = {
@@ -23,6 +24,7 @@ app.use(helmet());
 app.use(cors(corsOption));
 app.use(morgan("tiny"));
 
+app.use(csrfCheck);
 app.use("/tweets", tweetsRouter);
 app.use("/auth", authRouter);
 
